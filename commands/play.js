@@ -1,4 +1,5 @@
-exports.execute = function(args, message, player, battleEnemies) {
+exports.execute = function(args, message, player, battleEnemies, gameState) {
+	if(gameState != "battle") return message.channel.send("You can only use this command during a battle!");
 	let playCard = args[0];
 	if(!playCard) return message.channel.send("You must specify a card to play!");
 	let cardNumber = parseInt(playCard);

@@ -1,4 +1,4 @@
-exports.execute = function(args, message, player, battleEnemies) {
+exports.execute = function(args, message, player, battleEnemies, gameState) {
 	//describe the enemies intents
 	let returnString = `${player.health}/${player.maxHealth} health - ${player.energy} energy - ${player.block} block - ${Object.keys(player.effects).length} effect(s)\n**enemies**\n`;
 	for(let i = 0; i < battleEnemies.length; i++){

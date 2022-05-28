@@ -1,6 +1,12 @@
 const look = require('./look');
+const endBattle = require('../other/battleend');
 
-exports.execute = function(args, message, player, battleEnemies) {
+exports.execute = function(args, message, player, battleEnemies, gameState) {
+	if(gameState != "battle") return message.channel.send("You can only use this command during a battle!");
+	if(battleEnemies.length == 0){
+		endBattle.execute(message, player, battleEnemies, gameState);
+		return;
+	}
 	player.restoreEnergy();
 	player.discardHand();
 	player.stockHand();

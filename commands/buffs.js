@@ -1,4 +1,5 @@
-exports.execute = function(args, message, player, battleEnemies) {
+exports.execute = function(args, message, player, battleEnemies, gameState) {
+	if(gameState != "battle") return message.channel.send("You can only use this command during a battle!");
 	if(args.length == 0 || args[0] == "player"){
 		//send the player's effects
 		let returnString = "**Your effects:**\n";

@@ -4,7 +4,9 @@ const fs = require('fs');
 const cards = require('./cards');
 const playerClass = require('./player');
 const enemies = require('./enemies');
-const token = require('./token');
+const relics = require('./relics');
+const {token} = require('./token');
+
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -18,19 +20,21 @@ for(const file of commandFiles){
 }
 
 //initialize the game
+var gameState = "battle";
 var player = new playerClass.Player();
+
+var battleEnemies = []; 
+let newEnemy = new enemies.Bug(player, battleEnemies);
+battleEnemies.push(newEnemy);
+
 for(let i = 0; i < 4; i++){
 	player.deck.push(new cards.Strike());
 	player.deck.push(new cards.Defend());
-} 
+}
 player.deck.push(new cards.Bash());
 player.shuffleDeck();
 player.stockHand();
-var battleEnemies = []; 
-let newEnemy = new enemies.Bug(player, battleEnemies);
-let otherEnemy = new enemies.Bug(player, battleEnemies);
-battleEnemies.push(newEnemy);
-battleEnemies.push(otherEnemy);
+player.addRelic(new relics.HealthRelic())
 
 client.on('messageCreate', (message) => {
     if (message.author.bot) return;
@@ -39,16 +43,16 @@ client.on('messageCreate', (message) => {
 	let commandName = args[0];
 	args = args.slice(1);
 	if(commandFiles.includes(commandName)){
-		commands[commandName].execute(args, message, player, battleEnemies);
+		commands[commandName].execute(args, message, player, battleEnemies, gameState);
 	}else{
 		//check if the command is the name of a card
 		for(let i = 0; i < player.hand.length; i++){
 			if(player.hand[i].name.toLowerCase() == commandName.toLowerCase()){
-				commands["play"].execute([commandName].concat(args), message, player, battleEnemies);
+				commands["play"].execute([commandName].concat(args), message, player, battleEnemies, gameState);
 				return;
 			}
 		}
 	}
 });
 
-client.login(token.token);
+client.login(token);

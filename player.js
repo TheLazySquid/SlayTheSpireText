@@ -10,6 +10,14 @@ class Player {
 		this.graveyard = [];
 		this.drawPile = [];
 		this.effects = {};
+		this.relics = {
+			all: [],
+			postbattle: [],
+		};
+	}
+	addRelic(relic){
+		this.relics.all.push(relic);
+		this.relics[relic.activation].push(relic);
 	}
 	takeDamage(damage){
 		if(this.effects.Vulnerable?.amount > 0) damage = Math.ceil(damage * 1.5);
@@ -21,6 +29,10 @@ class Player {
 		}
 		//return the amount of damage taken
 		return actualDamage;
+	}
+	gainHealth(amount){
+		this.health += amount;
+		if(this.health > this.maxHealth) this.health = this.maxHealth;
 	}
 	addEffect(effect){
 		//check if the buff is already applied
@@ -40,6 +52,11 @@ class Player {
 	}
 	play(card, enemy){
 		return this.hand[card].play(this, enemy);
+	}
+	clearHand(){
+		this.hand = [];
+		this.drawPile = [];
+		this.discard = [];
 	}
 	discardHand(){
 		this.discard = this.discard.concat(this.hand);
