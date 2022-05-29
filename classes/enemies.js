@@ -15,9 +15,12 @@ class Enemy {
 	}
 	get intent(){
 		let returnMessage = `intends to ${this.nextAttack.name}`;
-		if(this.nextAttack.damage != 0){
-			returnMessage += ` for ${this.nextAttack.damage} damage`;
-		}
+		let effects = [];
+		if(this.nextAttack.effect.damage) effects.push(` to deal ${this.nextAttack.effect.damage} damage`);
+		if(this.nextAttack.effect.block) effects.push(` to gain block`);
+		if(this.nextAttack.effect.heal) effects.push(` to heal`);
+		if(this.nextAttack.effect.playerEffects) effects.push(` to debuff you`);
+		returnMessage += effects.join(" and");
 		return returnMessage
 	}
 	addEffect(effect){
@@ -34,6 +37,10 @@ class Enemy {
 	}
 	gainBlock(amount){
 		this.block += amount;
+		return amount;
+	}
+	gainHealth(amount){
+		this.health += amount;
 		return amount;
 	}
 	takeDamage(damage){
@@ -59,6 +66,9 @@ class Enemy {
 			this.nextAttackIndex = 0;
 		}
 	}
+	clearBlock(){
+		this.block = 0;
+	}
 }
 
 class Bug extends Enemy {
@@ -66,10 +76,20 @@ class Bug extends Enemy {
 		super(player, 30, "Bug", battleEnemies);
 		this.attacks = [
 			new attacks.Chomp(),
-			new attacks.Defend(),
-			new attacks.Weaken()
+			new attacks.Defend()
+		]
+	}
+}
+
+class Frog extends Enemy {
+	constructor(player, battleEnemies){
+		super(player, 50, "Frog", battleEnemies);
+		this.attacks = [
+			new attacks.Tounge(),
+			new attacks.Heal()
 		]
 	}
 }
 
 exports.Bug = Bug;
+exports.Frog = Frog;

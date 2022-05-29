@@ -1,3 +1,5 @@
+const {shuffle} = require('../other/utils');
+
 class Player {
 	constructor(){
 		this.health = 80;
@@ -46,6 +48,9 @@ class Player {
 	removeEffect(effect){
 		delete this.effects[effect.name];
 	}
+	clearBlock(){
+		this.block = 0;
+	}
 	gainBlock(amount){
 		this.block += amount;
 		return amount;
@@ -70,12 +75,12 @@ class Player {
 	}
 	shuffleDeck(){
 		this.drawPile = [...this.deck];
-		this.drawPile.sort(() => Math.random() - 0.5);
+		shuffle(this.drawPile);
 	}
 	shuffleDiscard(){
 		this.drawPile = [...this.discard];
 		this.discard = [];
-		this.drawPile.sort(() => Math.random() - 0.5);
+		shuffle(this.drawPile);
 	}
 	discardCard(index){
 		this.discard.push(this.hand.splice(index, 1)[0]);
@@ -87,5 +92,5 @@ class Player {
 		this.energy = 3;
 	}
 }
-
+  
 exports.Player = Player;

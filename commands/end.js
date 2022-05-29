@@ -1,10 +1,11 @@
 const look = require('./look');
 const endBattle = require('../other/battleend');
+const {send} = require('../other/utils');
 
-exports.execute = function(args, message, player, battleEnemies, gameState) {
-	if(gameState != "battle") return message.channel.send("You can only use this command during a battle!");
+exports.execute = function(args, message, player, battleEnemies, game) {
+	if(game.state != "battle") return send("You can only use this command during a battle!", message);
 	if(battleEnemies.length == 0){
-		endBattle.execute(message, player, battleEnemies, gameState);
+		endBattle.execute(message, player, battleEnemies, game);
 		return;
 	}
 	player.restoreEnergy();
@@ -32,12 +33,21 @@ exports.execute = function(args, message, player, battleEnemies, gameState) {
 				turnMessage += `${battleEnemies[i].name} gave you ${effect.playerEffects[j].amount} ${effect.playerEffects[j].name}!\n`;
 			}
 		}
+		if(effect.heal){
+			turnMessage += `${battleEnemies[i].name} healed for ${effect.heal} health!\n`;
+		}
 		totalDamage += effect.damage;
 		battleEnemies[i].cycleAttacks();
 	}
 	if(totalDamage > 0){
 		turnMessage += `you took ${totalDamage} damage!\n`;
 	}
-	message.channel.send(turnMessage);
-	look.execute(args, message, player, battleEnemies);
+	//remove all block
+	for(let i = 0; i < battleEnemies.length; i++){
+		battleEnemies[i].clearBlock();
+	}
+	player.clearBlock();
+	
+	send(turnMessage, message);
+	look.execute(args, message, player, battleEnemies, game);
 }

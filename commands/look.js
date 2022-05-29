@@ -1,4 +1,20 @@
-exports.execute = function(args, message, player, battleEnemies, gameState) {
+const {send} = require('../other/utils');
+
+exports.execute = function(args, message, player, battleEnemies, game) {
+	if(game.state == "map"){
+		let returnString = "";
+		for(let i = 0; i < game.nextPaths.length; i++){
+			returnString += `${i + 1}. ${game.nextPaths[i]}\n`;
+		}
+		return send(returnString, message, "Where would you like to go?");
+	}
+	if(game.state == "rewards"){
+		let returnString = "";
+		for(let i = 0; i < game.cardOptions.length; i++){
+			returnString += `${i+1}. ${game.cardOptions[i].description}\n`;
+		}
+		return send(returnString, message, "Choose a card to accept, or skip");
+	}
 	//describe the enemies intents
 	let returnString = `${player.health}/${player.maxHealth} health - ${player.energy} energy - ${player.block} block - ${Object.keys(player.effects).length} effect(s)\n**enemies**\n`;
 	for(let i = 0; i < battleEnemies.length; i++){
@@ -16,5 +32,5 @@ exports.execute = function(args, message, player, battleEnemies, gameState) {
 			returnString += `${i+1}: ${player.hand[i].description}\n`;
 		}
 	}
-	message.channel.send(`${returnString}`);
+	send(returnString, message, "Current battle:");
 }

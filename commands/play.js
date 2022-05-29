@@ -1,36 +1,25 @@
-exports.execute = function(args, message, player, battleEnemies, gameState) {
-	if(gameState != "battle") return message.channel.send("You can only use this command during a battle!");
+const {send, arrayIndexOf} = require('../other/utils');
+
+exports.execute = function(args, message, player, battleEnemies, game) {
+	if(game.state != "battle") return send("You can only use this command during a battle!", message);
+	//check that the card the player wants to use is in their hand
 	let playCard = args[0];
-	if(!playCard) return message.channel.send("You must specify a card to play!");
-	let cardNumber = parseInt(playCard);
-	if(isNaN(cardNumber)){
-		//try to find a card with a matching name
-		for(let i = 0; i < player.hand.length; i++){
-			if(player.hand[i].name.toLowerCase() == playCard.toLowerCase()){
-				cardNumber = i;
-				break;
-			}
-		}
-	}else cardNumber--;
-	if(player.hand[cardNumber] == undefined) return message.channel.send("You don't have that card in your hand!");
-	if(player.hand[cardNumber].cost > player.energy) return message.channel.send("You don't have enough energy to play that card!");
+	if(!playCard) return send("You must specify a card to play!", message);
+	let cardNumber = arrayIndexOf(player.hand, playCard, (card, input) => card.name.toLowerCase() == input.toLowerCase());
+	if(cardNumber == -1) return send("You don't have a card called " + playCard + "!", message);
+	if(player.hand[cardNumber].cost > player.energy) return send("You don't have enough energy to play that card!", message);
+
 	let result;
 	if(player.hand[cardNumber].selector){
 		//this is a selector card, so we need to select an enemy
 		let enemyIndex = parseInt(args[1]);
 		//if there's only one enemy, we can just use the first index
 		if(battleEnemies.length == 1) enemyIndex = 0;
-		else if(args[1] == undefined) return message.channel.send("You must specify an enemy to play this card on!");
-		else if(isNaN(enemyIndex)){
-			//try to find an enemy with a matching name
-			for(let i = 0; i < battleEnemies.length; i++){
-				if(battleEnemies[i].name.toLowerCase() == args[1].toLowerCase()){
-					enemyIndex = i;
-					break;
-				}
-			}
-		}else enemyIndex--;
-		if(battleEnemies[enemyIndex] == undefined) return message.channel.send("Enemy not found!");
+		else if(args[1] == undefined) return send("You must specify an enemy to play this card on!", message);
+		else{
+			enemyIndex = arrayIndexOf(battleEnemies, args[1], (enemy, input) => enemy.name.toLowerCase() == input.toLowerCase());
+		}
+		if(battleEnemies[enemyIndex] == undefined) return send("Enemy not found!", message);
 		result = player.play(cardNumber, battleEnemies[enemyIndex]);
 
 	}else{
@@ -55,7 +44,7 @@ exports.execute = function(args, message, player, battleEnemies, gameState) {
 			returnString += `${result.enemyEffects[i].amount} ${result.enemyEffects[i].name} applied!\n`;
 		}
 	}
-	message.channel.send(returnString);
+	send(returnString, message);
 
 	//discard the card
 	player.discardCard(cardNumber);
